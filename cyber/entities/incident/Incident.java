@@ -1,4 +1,6 @@
-package incident;
+package entities.incident;
+
+import entities.enums.Severity;
 
 public abstract class Incident
 {
@@ -8,6 +10,6 @@ public abstract class Incident
 
     public Incident(Severity severity)
     {
-        this.incidentID = ("INC-" + String.format("%03d", counter++);
+        this.incidentID = ("INC-" + String.format("%03d", counter++));
     }
 }

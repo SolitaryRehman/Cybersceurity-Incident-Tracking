@@ -1,4 +1,5 @@
-import incident.Incident;
+import entities.enums.Severity;
+import entities.incident.Incident;
 
 public class Network extends Incident
 {
@@ -9,4 +10,8 @@ public class Network extends Incident
     private double bandwidthUsage;
     private String deviceType;
     private int VLANID;
+
+    public Network(Severity severity) {
+        super(severity);
+    }
 }

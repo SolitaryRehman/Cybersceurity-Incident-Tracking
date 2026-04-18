@@ -1,7 +1,7 @@
 package entities;
 
 import entities.Analyst;
-import incident.Incident;
+import entities.incident.Incident;
 import entities.enums.Risk;
 import entities.enums.ResolutionStatus;
 import java.time.LocalDateTime;
