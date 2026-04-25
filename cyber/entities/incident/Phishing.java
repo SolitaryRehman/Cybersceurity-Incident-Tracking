@@ -1,3 +1,5 @@
+package entities.incident;
+
 import entities.enums.Severity;
 import entities.incident.Incident;
 import java.util.function.IntConsumer;

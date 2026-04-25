@@ -1,3 +1,5 @@
+package entities.incident;
+
 import entities.incident.Incident;
 
 import entities.enums.Severity;

@@ -38,7 +38,7 @@ public class AlertManager
         Vector<Alert> filtered = new Vector<>();
         for (Alert alert : alerts)
         {
-            if (alert.getType() == type)
+            if (alert.getAlertType() == type)
             {
                 filtered.add(alert);
             }
