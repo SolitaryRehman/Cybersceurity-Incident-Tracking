@@ -7,122 +7,568 @@ import entities.enums.ResolutionStatus;
 import entities.enums.Risk;
 import entities.enums.Severity;
 import entities.incident.DDOS;
+import entities.incident.Incident;
 import entities.incident.Malware;
+import entities.incident.Network;
+import entities.incident.Phishing;
+import entities.incident.Ransomware;
 import entities.incident.SQLInjection;
+import entities.incident.UnauthorizedAccess;
 import service.AlertManager;
+import service.Authenticator;
 import service.IncidentManager;
 import service.LogManager;
 import service.LogViewer;
+import service.ReportGenerator;
 
+import java.util.Scanner;
 import java.util.Vector;
 
 public class Main
 {
+    private static Scanner scanner = new Scanner(System.in);
+
     public static void main(String[] args)
     {
         AlertManager alertManager = new AlertManager();
         LogManager logManager = new LogManager(alertManager);
         LogViewer logViewer = new LogViewer(logManager);
         IncidentManager incidentManager = new IncidentManager(logManager);
+        ReportGenerator reportGenerator = new ReportGenerator(logManager);
+        Authenticator authenticator = new Authenticator();
 
-        Analyst analyst1 = new Analyst("bilal", "<password>");
-        Analyst analyst2 = new Analyst("sara", "<password>");
+        boolean running = true;
 
-        Malware malware = new Malware(Severity.HIGH);
-        SQLInjection sqlInjection = new SQLInjection(Severity.CRITICAL);
-        DDOS ddos = new DDOS(Severity.MEDIUM);
+        while(running)
+        {
+            System.out.println("\n====================================");
+            System.out.println(" CYBERSECURITY INCIDENT TRACKER");
+            System.out.println("====================================");
 
-        Log log1 = new Log(
-            malware,
-            analyst1,
-            "Trojan malware detected from email attachment",
-            "User downloaded suspicious file",
-            Risk.HIGH,
-            ResolutionStatus.LOGGED
+            if(!authenticator.isLoggedIn())
+            {
+                System.out.println("1. Register Analyst");
+                System.out.println("2. Login");
+            }
+
+            else
+            {
+                System.out.println("3. Logout");
+                System.out.println("4. Add Incident Log");
+                System.out.println("5. View All Logs");
+                System.out.println("6. Search Logs");
+                System.out.println("7. Filter Logs By Incident Type");
+                System.out.println("8. Filter Logs By Analyst");
+                System.out.println("9. Filter Logs By Risk");
+                System.out.println("10. Sort Logs By Recent First");
+                System.out.println("11. Sort Logs By Severity Highest First");
+                System.out.println("12. Update Log");
+                System.out.println("13. Delete Log");
+                System.out.println("14. View All Alerts");
+                System.out.println("15. View Alerts By Level");
+                System.out.println("16. Create Manual Alert");
+                System.out.println("17. Generate Monthly Report");
+                System.out.println("18. Read Monthly Report");
+            }
+
+            System.out.println("0. Exit\n");
+            System.out.print("Choose option: ");
+
+            int choice = readInt();
+
+            switch(choice)
+            {
+                case 1:
+                    if(!authenticator.isLoggedIn())
+                        registerAnalyst(authenticator);
+                    else
+                        System.out.println("You are already logged in.");
+                    break;
+
+                case 2:
+                    if(!authenticator.isLoggedIn())
+                        login(authenticator);
+                    else
+                        System.out.println("You are already logged in.");
+                    break;
+
+                case 3:
+                    if(authenticator.logout())
+                        System.out.println("Logged out successfully.");
+                    break;
+
+                case 4:
+                    if(requireLogin(authenticator))
+                        addIncidentLog(logManager, authenticator.getCurrentUser());
+                    break;
+
+                case 5:
+                    printLogs(logManager.getAllLogs());
+                    break;
+
+                case 6:
+                    System.out.print("Enter search keyword: ");
+                    String query = scanner.nextLine();
+                    printLogs(logViewer.searchLogs(query));
+                    break;
+
+                case 7:
+                    filterByIncidentType(incidentManager);
+                    break;
+
+                case 8:
+                    System.out.print("Enter analyst username: ");
+                    String username = scanner.nextLine();
+                    printLogs(logViewer.viewLogsByAnalyst(username));
+                    break;
+
+                case 9:
+                    Risk risk = chooseRisk();
+                    printLogs(logViewer.viewLogsByRisk(risk));
+                    break;
+
+                case 10:
+                    printLogs(logViewer.sortByRecentFirst());
+                    break;
+
+                case 11:
+                    printLogs(logViewer.sortBySeverityHighestFirst());
+                    break;
+
+                case 12:
+                    if(requireLogin(authenticator))
+                        updateLog(logManager, authenticator.getCurrentUser());
+                    break;
+
+                case 13:
+                    deleteLog(logManager);
+                    break;
+
+                case 14:
+                    printAlerts(alertManager.getAlerts());
+                    break;
+
+                case 15:
+                    AlertLevel level = chooseAlertLevel();
+                    printAlerts(alertManager.getAlertsByLevel(level));
+                    break;
+
+                case 16:
+                    createManualAlert(logManager, alertManager);
+                    break;
+
+                case 17:
+                    generateReport(reportGenerator);
+                    break;
+
+                case 18:
+                    readReport(reportGenerator);
+                    break;
+
+                case 0:
+                    running = false;
+                    System.out.println("Exiting system...");
+                    break;
+
+                default:
+                    System.out.println("Invalid option.");
+            }
+        }
+
+        scanner.close();
+    }
+
+    private static void registerAnalyst(Authenticator authenticator)
+    {
+        System.out.print("Enter username: ");
+        String username = scanner.nextLine();
+
+        System.out.print("Enter password: ");
+        String password = scanner.nextLine();
+
+        Analyst analyst = new Analyst(username, password);
+        authenticator.registerAnalyst(analyst);
+
+        System.out.println("\nANALYST REGISTERED SUCCESSFULLY.");
+    }
+
+    private static void login(Authenticator authenticator)
+    {
+        System.out.print("Enter username: ");
+        String username = scanner.nextLine();
+
+        System.out.print("Enter password: ");
+        String password = scanner.nextLine();
+
+        if(authenticator.login(username, password))
+            System.out.println("\nLOGIN SUCCESSFUL.");
+        else
+            System.out.println("\nINVALID USERNAME OR PASSWORD.");
+    }
+
+    private static boolean requireLogin(Authenticator authenticator)
+    {
+        if(!authenticator.isLoggedIn())
+        {
+            System.out.println("\nYOU MUST LOGIN FIRST.");
+            return false;
+        }
+
+        return true;
+    }
+
+    private static void addIncidentLog(LogManager logManager, Analyst currentUser)
+    {
+        Incident incident = createIncidentFromMenu();
+
+        System.out.print("Enter description: ");
+        String description = scanner.nextLine();
+
+        System.out.print("Enter cause: ");
+        String cause = scanner.nextLine();
+
+        Risk risk = chooseRisk();
+        ResolutionStatus status = chooseResolutionStatus();
+
+        Log log = new Log(
+            incident,
+            currentUser,
+            description,
+            cause,
+            risk,
+            status
         );
 
-        Log log2 = new Log(
-            sqlInjection,
-            analyst2,
-            "SQL injection attempt detected on login page",
-            "Unsanitized input attempt",
-            Risk.CRITICAL,
-            ResolutionStatus.RESOLVING
-        );
+        logManager.logIncident(log);
 
-        Log log3 = new Log(
-            ddos,
-            analyst1,
-            "Unusual traffic spike detected on HTTPS service",
-            "Possible distributed denial of service attack",
-            Risk.MEDIUM,
-            ResolutionStatus.LOGGED
-        );
+        System.out.println("Log added successfully.");
+        System.out.println("Generated Log ID: " + log.getLogID());
+    }
 
-        logManager.logIncident(log1);
-        logManager.logIncident(log2);
-        logManager.logIncident(log3);
+    private static Incident createIncidentFromMenu()
+    {
+        System.out.println("\nChoose Incident Type:");
+        System.out.println("1. Malware");
+        System.out.println("2. SQL Injection");
+        System.out.println("3. DDOS");
+        System.out.println("4. Network");
+        System.out.println("5. Phishing");
+        System.out.println("6. Ransomware");
+        System.out.println("7. Unauthorized Access");
+        System.out.print("\nChoose option: ");
 
-        System.out.println("===== ALL LOGS =====");
-        printLogs(logManager.getAllLogs());
+        int type = readInt();
 
-        System.out.println("\n===== SEARCH: 'login' =====");
-        printLogs(logViewer.searchLogs("login"));
+        Severity severity = chooseSeverity();
 
-        System.out.println("\n===== MALWARE LOGS =====");
-        printLogs(incidentManager.viewMalwareLogs());
+        switch(type)
+        {
+            case 1:
+                return new Malware(severity);
 
-        System.out.println("\n===== SQL INJECTION LOGS =====");
-        printLogs(incidentManager.viewSQLInjectionLogs());
+            case 2:
+                return new SQLInjection(severity);
 
-        System.out.println("\n===== DDOS LOGS =====");
-        printLogs(incidentManager.viewDDOSLogs());
+            case 3:
+                return new DDOS(severity);
 
-        System.out.println("\n===== LOGS BY ANALYST: bilal =====");
-        printLogs(logViewer.viewLogsByAnalyst("bilal"));
+            case 4:
+                return new Network(severity);
 
-        System.out.println("\n===== LOGS BY RISK: HIGH =====");
-        printLogs(logViewer.viewLogsByRisk(Risk.HIGH));
+            case 5:
+                return new Phishing(severity);
 
-        System.out.println("\n===== SORTED BY RECENT FIRST =====");
-        printLogs(logViewer.sortByRecentFirst());
+            case 6:
+                return new Ransomware(severity);
 
-        System.out.println("\n===== SORTED BY SEVERITY HIGHEST FIRST =====");
-        printLogs(logViewer.sortBySeverityHighestFirst());
+            case 7:
+                return new UnauthorizedAccess(severity);
 
-        Alert alert1 = alertManager.createAlert(log1, AlertType.AUTOMATIC, AlertLevel.HIGH);
-        Alert alert2 = alertManager.createAlert(log2, AlertType.MANUAL, AlertLevel.HIGH);
+            default:
+                System.out.println("Invalid incident type. Defaulting to Network incident.");
+                return new Network(severity);
+        }
+    }
 
-        System.out.println("\n===== ALL ALERTS =====");
-        printAlerts(alertManager.getAlerts());
+    private static void filterByIncidentType(IncidentManager incidentManager)
+    {
+        System.out.println("\nFilter By Incident Type:");
+        System.out.println("1. Malware");
+        System.out.println("2. SQL Injection");
+        System.out.println("3. DDOS");
+        System.out.println("4. Network");
+        System.out.println("5. Phishing");
+        System.out.println("6. Ransomware");
+        System.out.println("7. Unauthorized Access");
+        System.out.print("\nChoose option: ");
 
-        System.out.println("\n===== HIGH ALERTS =====");
-        printAlerts(alertManager.getAlertsByLevel(AlertLevel.HIGH));
+        int choice = readInt();
+
+        switch(choice)
+        {
+            case 1:
+                printLogs(incidentManager.viewMalwareLogs());
+                break;
+
+            case 2:
+                printLogs(incidentManager.viewSQLInjectionLogs());
+                break;
+
+            case 3:
+                printLogs(incidentManager.viewDDOSLogs());
+                break;
+
+            case 4:
+                printLogs(incidentManager.viewNetworkLogs());
+                break;
+
+            case 5:
+                printLogs(incidentManager.viewPhishingLogs());
+                break;
+
+            case 6:
+                printLogs(incidentManager.viewRansomwareLogs());
+                break;
+
+            case 7:
+                printLogs(incidentManager.viewUnauthorizedAccessLogs());
+                break;
+
+            default:
+                System.out.println("Invalid incident type.");
+        }
+    }
+
+    private static void updateLog(LogManager logManager, Analyst currentUser)
+    {
+        System.out.print("Enter Log ID to update: ");
+        String logID = scanner.nextLine();
+
+        Log oldLog = logManager.getLog(logID);
+
+        if(oldLog == null)
+        {
+            System.out.println("Log not found.");
+            return;
+        }
+
+        System.out.print("Enter new description: ");
+        String description = scanner.nextLine();
+
+        System.out.print("Enter new cause: ");
+        String cause = scanner.nextLine();
+
+        Risk risk = chooseRisk();
+        ResolutionStatus status = chooseResolutionStatus();
 
         Log updatedLog = new Log(
-            ddos,
-            analyst1,
-            "Updated: DDoS traffic confirmed and escalated",
-            "High traffic from multiple sources",
-            Risk.HIGH,
-            ResolutionStatus.RESOLVING
+            oldLog.getIncident(),
+            currentUser,
+            description,
+            cause,
+            risk,
+            status
         );
 
-        updatedLog.setLogID(log3.getLogID());
+        updatedLog.setLogID(oldLog.getLogID());
 
-        boolean updated = logManager.updateLog(log3.getLogID(), updatedLog);
+        boolean updated = logManager.updateLog(logID, updatedLog);
 
-        System.out.println("\nUpdate " + log3.getLogID() + " successful? " + updated);
+        if(updated)
+            System.out.println("Log updated successfully.");
+        else
+            System.out.println("Log update failed.");
+    }
 
-        System.out.println("\n===== ALL LOGS AFTER UPDATE =====");
-        printLogs(logManager.getAllLogs());
+    private static void deleteLog(LogManager logManager)
+    {
+        System.out.print("Enter Log ID to delete: ");
+        String logID = scanner.nextLine();
 
-        boolean deleted = logManager.deleteLog(log1.getLogID());
+        boolean deleted = logManager.deleteLog(logID);
 
-        System.out.println("\nDelete " + log1.getLogID() + " successful? " + deleted);
+        if(deleted)
+            System.out.println("Log deleted successfully.");
+        else
+            System.out.println("Log not found.");
+    }
 
-        System.out.println("\n===== ALL LOGS AFTER DELETE =====");
-        printLogs(logManager.getAllLogs());
+    private static void createManualAlert(LogManager logManager, AlertManager alertManager)
+    {
+        System.out.print("Enter Log ID for alert: ");
+        String logID = scanner.nextLine();
+
+        Log log = logManager.getLog(logID);
+
+        if(log == null)
+        {
+            System.out.println("Log not found.");
+            return;
+        }
+
+        AlertLevel level = chooseAlertLevel();
+
+        Alert alert = alertManager.createAlert(log, AlertType.MANUAL, level);
+
+        System.out.println("Manual alert created successfully.");
+        System.out.println("Alert ID: " + alert.getAlertID());
+    }
+
+    private static void generateReport(ReportGenerator reportGenerator)
+    {
+        System.out.print("Enter month number: ");
+        int month = readInt();
+
+        System.out.print("Enter year: ");
+        int year = readInt();
+
+        reportGenerator.generateMonthlyReport(month, year);
+
+        System.out.println("Report generation process completed.");
+    }
+
+    private static void readReport(ReportGenerator reportGenerator)
+    {
+        System.out.print("Enter month number: ");
+        int month = readInt();
+
+        System.out.print("Enter year: ");
+        int year = readInt();
+
+        reportGenerator.readMonthlyReport(month, year);
+    }
+
+    private static Severity chooseSeverity()
+    {
+        System.out.println("\nChoose Severity:");
+        System.out.println("1. LOW");
+        System.out.println("2. MEDIUM");
+        System.out.println("3. HIGH");
+        System.out.println("4. CRITICAL");
+        System.out.print("Choose option: ");
+
+        int choice = readInt();
+
+        switch(choice)
+        {
+            case 1:
+                return Severity.LOW;
+
+            case 2:
+                return Severity.MEDIUM;
+
+            case 3:
+                return Severity.HIGH;
+
+            case 4:
+                return Severity.CRITICAL;
+
+            default:
+                System.out.println("Invalid severity. Defaulting to LOW.");
+                return Severity.LOW;
+        }
+    }
+
+    private static Risk chooseRisk()
+    {
+        System.out.println("\nChoose Risk:");
+        System.out.println("1. NONE");
+        System.out.println("2. LOW");
+        System.out.println("3. MEDIUM");
+        System.out.println("4. HIGH");
+        System.out.println("5. CRITICAL");
+        System.out.print("Choose option: ");
+
+        int choice = readInt();
+
+        switch(choice)
+        {
+            case 1:
+                return Risk.NONE;
+
+            case 2:
+                return Risk.LOW;
+
+            case 3:
+                return Risk.MEDIUM;
+
+            case 4:
+                return Risk.HIGH;
+
+            case 5:
+                return Risk.CRITICAL;
+
+            default:
+                System.out.println("Invalid risk. Defaulting to NONE.");
+                return Risk.NONE;
+        }
+    }
+
+    private static ResolutionStatus chooseResolutionStatus()
+    {
+        System.out.println("\nChoose Resolution Status:");
+        System.out.println("1. LOGGED");
+        System.out.println("2. RESOLVING");
+        System.out.println("3. RESOLVED");
+        System.out.print("Choose option: ");
+
+        int choice = readInt();
+
+        switch(choice)
+        {
+            case 1:
+                return ResolutionStatus.LOGGED;
+
+            case 2:
+                return ResolutionStatus.RESOLVING;
+
+            case 3:
+                return ResolutionStatus.RESOLVED;
+
+            default:
+                System.out.println("Invalid status. Defaulting to LOGGED.");
+                return ResolutionStatus.LOGGED;
+        }
+    }
+
+    private static AlertLevel chooseAlertLevel()
+    {
+        System.out.println("\nChoose Alert Level:");
+        System.out.println("1. LOW");
+        System.out.println("2. MEDIUM");
+        System.out.println("3. HIGH");
+        System.out.print("Choose option: ");
+
+        int choice = readInt();
+
+        switch(choice)
+        {
+            case 1:
+                return AlertLevel.LOW;
+
+            case 2:
+                return AlertLevel.MEDIUM;
+
+            case 3:
+                return AlertLevel.HIGH;
+
+            default:
+                System.out.println("Invalid alert level. Defaulting to LOW.");
+                return AlertLevel.LOW;
+        }
+    }
+
+    private static int readInt()
+    {
+        while(!scanner.hasNextInt())
+        {
+            System.out.print("Invalid input. Enter a number: ");
+            scanner.nextLine();
+        }
+
+        int value = scanner.nextInt();
+        scanner.nextLine();
+        return value;
     }
 
     public static void printLogs(Vector<Log> logs)

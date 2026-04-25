@@ -32,16 +32,18 @@ public class AlertManager
         switch(level)
         {
             case LOW:
-                System.out.println("Sending alert to high-level executives!");
+                // Only for the technical/junior guys
+                System.out.println("[IT NOTIFICATION]: Routine event logged. Assigned to Junior Analyst.");
                 break;
 
             case MEDIUM:
-                System.out.println("Sending alert to managerial employees!");
+                System.out.println("[MANAGEMENT ALERT]: Potential security threat. Managerial oversight required.");
                 break;
 
             case HIGH:
-                System.out.println("Sending alert to ALL employees!");
+                System.out.println("[EMERGENCY BROADCAST]: Critical security breach! Executives and All Staff notified.");
                 break;
+
         }
         return alert;
     }
