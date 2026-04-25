@@ -10,88 +10,55 @@ public class IncidentManager
 {
     private LogManager logManager;
 
-    public Vector<Log> viewNetworkLogs()
+    public IncidentManager(LogManager logManager)
+    {
+        this.logManager = logManager;
+    }
+
+    public Vector<Log> viewLogsByType(Class<?> type)
     {
         Vector<Log> results = new Vector<Log>();
 
         for(Log l: logManager.getAllLogs())
         {
-            if(l.getIncident() instanceof Network)
+            if(type.isInstance(l.getIncident()))
                 results.add(l);
         }
         return results;
+    }
+
+    public Vector<Log> viewNetworkLogs()
+    {
+        return viewLogsByType(Network.class);
     }
 
     public Vector<Log> viewDDOSLogs()
     {
-        Vector<Log> results = new Vector<Log>();
-
-        for(Log l: logManager.getAllLogs())
-        {
-            if(l.getIncident() instanceof DDOS)
-                results.add(l);
-        }
-        return results;
+        return viewLogsByType(DDOS.class);
     }
 
     public Vector<Log> viewMalwareLogs()
     {
-        Vector<Log> results = new Vector<Log>();
-
-        for(Log l: logManager.getAllLogs())
-        {
-            if(l.getIncident() instanceof Malware)
-                results.add(l);
-        }
-        return results;
+        return viewLogsByType(Malware.class);
     }
 
     public Vector<Log> viewPhishingLogs()
     {
-        Vector<Log> results = new Vector<Log>();
-
-        for(Log l: logManager.getAllLogs())
-        {
-            if(l.getIncident() instanceof Phishing)
-                results.add(l);
-        }
-        return results;
+        return viewLogsByType(Phishing.class);
     }
 
     public Vector<Log> viewRansomwareLogs()
     {
-        Vector<Log> results = new Vector<Log>();
-
-        for(Log l: logManager.getAllLogs())
-        {
-            if(l.getIncident() instanceof Ransomware)
-                results.add(l);
-        }
-        return results;
+        return viewLogsByType(Ransomware.class);
     }
 
     public Vector<Log> viewSQLInjectionLogs()
     {
-        Vector<Log> results = new Vector<Log>();
-
-        for(Log l: logManager.getAllLogs())
-        {
-            if(l.getIncident() instanceof SQLInjection)
-                results.add(l);
-        }
-        return results;
+        return viewLogsByType(SQLInjection.class);
     }
 
     public Vector<Log> viewUnauthorizedAccessLogs()
     {
-        Vector<Log> results = new Vector<Log>();
-
-        for(Log l: logManager.getAllLogs())
-        {
-            if(l.getIncident() instanceof UnauthorizedAccess)
-                results.add(l);
-        }
-        return results;
+        return viewLogsByType(UnauthorizedAccess.class);
     }
-
 }

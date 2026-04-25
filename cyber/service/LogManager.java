@@ -1,14 +1,16 @@
 package service;
 
 import entities.Log;
-import entities.incident.Incident;
-
-import java.util.Objects;
 import java.util.Vector;
 
 public class LogManager
 {
     private Vector<Log> logs;
+
+    public LogManager()
+    {
+        this.logs = new Vector<Log>();
+    }
 
     public void logIncident(Log log)
     {
@@ -19,12 +21,13 @@ public class LogManager
     {
         boolean found = false;
 
-        for(Log l: logs)
+        for(int i = 0; i< logs.size(); i++)
         {
-            if(l.getLogID().equals(logID))
+            if(logs.get(i).getLogID().equals(logID))
             {
-                l = updatedLog;
+                logs.set(i, updatedLog);
                 found = true;
+                return found;
             }
         }
 
@@ -35,12 +38,13 @@ public class LogManager
     {
         boolean found = false;
 
-        for(Log l: logs)
+        for(int i = 0; i<logs.size(); i++)
         {
-            if(l.getLogID().equals(logID))
+            if(logs.get(i).getLogID().equals(logID))
             {
-                logs.remove(l);
+                logs.remove(logs.get(i));
                 found = true;
+                return found;
             }
         }
         return found;
@@ -57,7 +61,6 @@ public class LogManager
         {
             if(l.getLogID().equals(logID))
             {
-                logs.remove(l);
                 return l;
             }
         }
