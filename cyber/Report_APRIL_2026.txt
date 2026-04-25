@@ -1,0 +1,17 @@
+_______________________________________
+        MONTHLY INCIDENT REPORT
+        APRIL 2026
+_______________________________________
+Log ID        : LOG-01
+Incident ID   : INC-001
+Incident Type : Malware
+Severity      : HIGH
+Logged At     : 2026-04-25T23:34:23.848838900
+Logged By     : ali
+Description   : meow
+Cause         : billi scary
+Risk          : LOW
+Status        : RESOLVING
+----------------------------------------
+Total Incidents : 1
+___________________________________
