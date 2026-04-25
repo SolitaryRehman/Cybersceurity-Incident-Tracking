@@ -31,9 +31,17 @@ public class AlertManager
         alerts.add(alert);
         switch(level)
         {
-            case LOW: System.out.println("Sending alert to high-level executives!");
-            case MEDIUM: System.out.println("Sending alert to managerial employees!");
-            case HIGH: System.out.println("Sending alert to ALL employees!");
+            case LOW:
+                System.out.println("Sending alert to high-level executives!");
+                break;
+
+            case MEDIUM:
+                System.out.println("Sending alert to managerial employees!");
+                break;
+
+            case HIGH:
+                System.out.println("Sending alert to ALL employees!");
+                break;
         }
         return alert;
     }

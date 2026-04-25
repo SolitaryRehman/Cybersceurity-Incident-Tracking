@@ -10,22 +10,26 @@ import java.util.Vector;
 
 public class ReportGenerator
 {
-    private LogManager logManager;
-    private LogViewer logViewer;
-
-    public ReportGenerator(LogManager logManager, LogViewer logViewer)
+    public ReportGenerator(LogManager logManager)
     {
         this.logManager = logManager;
-        this.logViewer = logViewer;
     }
+
+    private LogManager logManager;
 
     // generates report for a specific month and saves it to a text file
     public void generateMonthlyReport(int month, int year)
     {
+        if(month < 1 || month > 12)
+        {
+            System.out.println("Invalid month. Please enter a value from 1 to 12.");
+            return;
+        }
+
         String monthName = Month.of(month).name();
         String fileName = "Report_" + monthName + "_" + year + ".txt";
 
-        Vector<Log> Logs = logManager.getLogs();
+        Vector<Log> Logs = logManager.getAllLogs();
 
         try
         {
@@ -46,7 +50,7 @@ public class ReportGenerator
                     count++;
                     writer.write("Log ID        : " + log.getLogID() + "\n");
                     writer.write("Incident ID   : " + log.getIncident().getIncidentID() + "\n");
-                    writer.write("Incident Type : " + log.getIncident().getType+ "\n");
+                    writer.write("Incident Type : " + log.getIncident().getClass().getSimpleName()+ "\n");
                     writer.write("Severity      : " + log.getIncident().getSeverity() + "\n");
                     writer.write("Logged At     : " + log.getLogTime() + "\n");
                     writer.write("Logged By     : " + log.getLoggedBy().getUsername() + "\n");
@@ -72,6 +76,12 @@ public class ReportGenerator
     // reads and prints the saved report for a specific month
     public void readMonthlyReport(int month, int year)
     {
+        if(month < 1 || month > 12)
+        {
+            System.out.println("Invalid month. Please enter a value from 1 to 12.");
+            return;
+        }
+
         String monthName = Month.of(month).name();
         String fileName = "Report_" + monthName + "_" + year + ".txt";
 

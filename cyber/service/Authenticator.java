@@ -16,34 +16,32 @@ public class Authenticator
     public void registerAnalyst(Analyst analyst) 
     {
         analysts.add(analyst);
-        System.out.println("Analyst registered: " + analyst.getUsername());
     }
 
     public boolean login(String username, String password) 
     {
         for (Analyst a : analysts) 
         {
-            if (a.getUsername().equals(username) && a.getPassword().equals(password)) 
+            if (a.getUsername().toLowerCase().equals(username.toLowerCase()) && a.getPassword().equals(password))
             {
                 currentUser = a;
-                System.out.println("Login successful! Welcome, " + username);
                 return true;
             }
         }
-        System.out.println("Invalid username or password.");
         return false;
     }
 
-    public void logout() 
+    public boolean logout()
     {
         if (currentUser != null) 
         {
-            System.out.println("Logged out: " + currentUser.getUsername());
             currentUser = null;
+            return true;
         } 
         else 
         {
             System.out.println("No user is currently logged in.");
+            return false;
         }
     }
 
