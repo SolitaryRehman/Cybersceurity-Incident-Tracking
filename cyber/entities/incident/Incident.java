@@ -9,8 +9,10 @@ public abstract class Incident
     private Severity severity;
 
     public Incident(Severity severity)
+
     {
         this.incidentID = ("INC-" + String.format("%03d", counter++));
+        this.severity = severity;
     }
 
     public static int getCounter() 

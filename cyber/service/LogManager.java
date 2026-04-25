@@ -1,20 +1,31 @@
 package service;
 
 import entities.Log;
+import entities.enums.AlertLevel;
+import entities.enums.AlertType;
+
 import java.util.Vector;
 
 public class LogManager
 {
     private Vector<Log> logs;
+    private AlertManager alertManager;
 
-    public LogManager()
+    public LogManager(AlertManager alertManager)
     {
         this.logs = new Vector<Log>();
+        this.alertManager = alertManager;
     }
 
     public void logIncident(Log log)
     {
         logs.add(log);
+
+        if(log.getIncident().getSeverity().getScore() + log.getRisk().getScore() > 2)
+        {
+            int alertScore = (log.getIncident().getSeverity().getScore() + log.getRisk().getScore() )/3;
+            alertManager.createAlert(log, AlertType.AUTOMATIC, AlertLevel.fromInt(alertScore));
+        }
     }
 
     public boolean updateLog(String logID, Log updatedLog)

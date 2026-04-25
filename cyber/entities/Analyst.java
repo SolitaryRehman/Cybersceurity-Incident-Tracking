@@ -7,9 +7,11 @@ public class Analyst
     private String username;
     private String password;
 
-    public Analyst()
+    public Analyst(String username, String password)
     {
         this.analystID = ("ANLYST-" + String.format("%02d", counter++));
+        this.username = username;
+        this.password = password;
     }
 
     public String getAnalystID() {

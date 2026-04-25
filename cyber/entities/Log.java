@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 
 public class Log
 {
+    private static int counter = 1;
     private String logID;
     private Incident incident;
     private LocalDateTime logTime;
@@ -17,10 +18,10 @@ public class Log
     private Risk risk;
     private ResolutionStatus resolutionStatus;
 
-    public Log(String logID, Incident incident, Analyst loggedBy, String desc,
+    public Log(Incident incident, Analyst loggedBy, String desc,
                String cause, Risk risk, ResolutionStatus status)
     {
-        this.logID = logID;
+        this.logID = ("LOG-" + String.format("%02d", counter++));
         this.incident = incident;
         this.loggedBy = loggedBy;
         this.logTime = LocalDateTime.now();

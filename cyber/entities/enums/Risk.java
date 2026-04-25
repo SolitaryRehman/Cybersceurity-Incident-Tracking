@@ -1,10 +1,11 @@
 package entities.enums;
 public enum Risk
 {
-    LOW (1),
-    MEDIUM (2),
-    HIGH (3),
-    CRITICAL(4);
+    NONE (1),
+    LOW (2),
+    MEDIUM (3),
+    HIGH (4),
+    CRITICAL(5);
 
     private final int score;
 

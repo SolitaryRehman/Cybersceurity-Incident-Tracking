@@ -17,5 +17,14 @@ public enum AlertLevel
     {
         return code;
     }
+
+    public static AlertLevel fromInt(int value) {
+        for (AlertLevel s : AlertLevel.values()) {
+            if (s.code == value) {
+                return s;
+            }
+        }
+        throw new IllegalArgumentException("Invalid Alert Level");
+    }
 }
 

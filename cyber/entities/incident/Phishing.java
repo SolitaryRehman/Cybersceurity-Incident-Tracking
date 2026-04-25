@@ -46,12 +46,12 @@ public class Phishing extends Incident
         this.emailSubject = emailSubject;
     }
 
-    public int getReceipientCount() 
+    public int getRecipientCount()
     {
         return recipientCount;
     }
 
-    public void setReceipientCount(int recipientCount) 
+    public void setRecipientCount(int recipientCount)
     {
         this.recipientCount = recipientCount;
     }
