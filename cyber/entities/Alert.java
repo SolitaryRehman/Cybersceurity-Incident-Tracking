@@ -8,6 +8,7 @@ public class Alert
     private static int counter = 1;
     private String alertID;
     private Log log;
+
     private AlertType type;
     private LocalDateTime triggerTime;
 
