@@ -12,4 +12,34 @@ public abstract class Incident
     {
         this.incidentID = ("INC-" + String.format("%03d", counter++));
     }
+
+    public static int getCounter() 
+    {
+        return counter;
+    }
+
+    private static void setCounter(int counter) 
+    {
+        Incident.counter = counter;
+    }
+
+    public String getIncidentID() 
+    {
+        return incidentID;
+    }
+
+    private void setIncidentID(String incidentID) 
+    {
+        this.incidentID = incidentID;
+    }
+
+    public Severity getSeverity() 
+    {
+        return severity;
+    }
+
+    public void setSeverity(Severity severity) 
+    {
+        this.severity = severity;
+    }
 }
