@@ -17,4 +17,36 @@ public class Alert
         this.type = type;
         this.triggerTime = triggerTime;
     }
+
+    public String getAlertID() {
+        return alertID;
+    }
+
+    public void setAlertID(String alertID) {
+        this.alertID = alertID;
+    }
+
+    public Log getLog() {
+        return log;
+    }
+
+    public void setLog(Log log) {
+        this.log = log;
+    }
+
+    public AlertType getAlertType() {
+        return type;
+    }
+
+    public void setAlertType(AlertType type) {
+        this.type = type;
+    }
+
+    public LocalDateTime getTriggerTime() {
+        return triggerTime;
+    }
+
+    public void setTriggerTime(LocalDateTime triggerTime) {
+        this.triggerTime = triggerTime;
+    }
 }
