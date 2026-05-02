@@ -1,0 +1,17 @@
+_______________________________________
+        MONTHLY INCIDENT REPORT
+        APRIL 2026
+_______________________________________
+Log ID        : LOG-01
+Incident ID   : INC-001
+Incident Type : DDOS
+Severity      : CRITICAL
+Logged At     : 2026-04-26T02:08:06.422520
+Logged By     : bilal
+Description   : POPOPOP
+Cause         : test cause
+Risk          : HIGH
+Status        : LOGGED
+----------------------------------------
+Total Incidents : 1
+___________________________________
